@@ -1,38 +1,39 @@
-"use client";
-import React from "react";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { UserButton, SignedOut, SignInButton } from "@clerk/nextjs";
 
 export default function Header() {
-  const router = useRouter();
-
-  const handleGetStarted = () => {
-    router.push("/robots-analysis"); // Navigates to the robots analysis page
-  };
-
   return (
-    <header>
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-gray-200/20 z-50">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600"
-          >
-            AI Optimizer
-          </motion.div>
-          <div className="flex items-center gap-6">
-            <Button
-              onClick={handleGetStarted}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 text-white"
+    <header className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex-shrink-0">
+            <Link href="/" className="text-2xl font-bold text-gray-900">
+              AIO Analysis Tool
+            </Link>
+          </div>
+          <nav className="hidden md:flex space-x-10">
+            <Link
+              href="/dashboard"
+              className="text-base font-medium text-gray-500 hover:text-gray-900"
             >
-              Get Started
-            </Button>
+              Dashboard
+            </Link>
+            <Link
+              href="/about"
+              className="text-base font-medium text-gray-500 hover:text-gray-900"
+            >
+              About
+            </Link>
+          </nav>
+          <div className="flex items-center">
+            <UserButton />
+            <SignedOut>
+              {/* Signed out users get sign in button */}
+              <SignInButton />
+            </SignedOut>
           </div>
         </div>
-      </nav>
+      </div>
     </header>
   );
 }

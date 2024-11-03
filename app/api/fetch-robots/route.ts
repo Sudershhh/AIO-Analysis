@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,6 +18,12 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Check cache first
+    const cachedResult = await redis.get(`robots:${url}`);
+    if (cachedResult) {
+      return NextResponse.json(JSON.parse(cachedResult as string));
+    }
+
     const robotsTxtUrl = new URL("/robots.txt", url).toString();
     const response = await fetch(robotsTxtUrl);
 
@@ -22,7 +34,12 @@ export async function GET(request: Request) {
     const robotsTxt = await response.text();
     const analysisResults = analyzeRobotsTxt(robotsTxt);
 
-    return NextResponse.json({ robotsTxt, analysisResults });
+    const result = { robotsTxt, analysisResults };
+
+    // Cache the result
+    await redis.set(`robots:${url}`, JSON.stringify(result), { ex: 86400 }); // Cache for 24 hours
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching robots.txt:", error);
     return NextResponse.json(

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Header";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   title: "AI Optimization (AIO) Analysis Tool",
   description: "Analyze and optimize robots.txt files for AI accessibility",
   icons: {
-    icon: "./favicon.png",
+    icon: "/favicon.png",
   },
 };
 
@@ -28,13 +29,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Header />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider afterSignOutUrl={"/"}>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <Header />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
