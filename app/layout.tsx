@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Header";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   title: "AI Optimization (AIO) Analysis Tool",
   description: "Analyze and optimize robots.txt files for AI accessibility",
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon.png", // Path to the favicon in the public directory
   },
 };
 
@@ -36,6 +37,7 @@ export default function RootLayout({
         >
           <Header />
           {children}
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

@@ -1,37 +1,91 @@
 import Link from "next/link";
 import { UserButton, SignedOut, SignInButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import Image from "next/image";
 
 export default function Header() {
   return (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex-shrink-0">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              AIO Analysis Tool
-            </Link>
-          </div>
-          <nav className="hidden md:flex space-x-10">
-            <Link
-              href="/dashboard"
-              className="text-base font-medium text-gray-500 hover:text-gray-900"
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-12 items-center justify-between px-3">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="text-sm font-semibold"
+          aria-label="AIO Analysis Tool Home"
+        >
+          <Image src="/favicon.png" alt="Logo" width={32} height={32} />
+        </Link>
+
+        {/* Desktop Navigation */}
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList className="gap-1">
+            <NavigationMenuItem>
+              <Link
+                href="/dashboard"
+                className="text-sm px-2 py-1 rounded hover:bg-accent"
+              >
+                Dashboard
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link
+                href="/about"
+                className="text-sm px-2 py-1 rounded hover:bg-accent"
+              >
+                About
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        {/* Mobile Navigation */}
+        <Sheet>
+          <SheetTrigger asChild className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-1"
+              aria-label="Open menu"
             >
-              Dashboard
-            </Link>
-            <Link
-              href="/about"
-              className="text-base font-medium text-gray-500 hover:text-gray-900"
-            >
-              About
-            </Link>
-          </nav>
-          <div className="flex items-center">
-            <UserButton />
-            <SignedOut>
-              {/* Signed out users get sign in button */}
-              <SignInButton />
-            </SignedOut>
-          </div>
+              <Menu className="h-4 w-4" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-48">
+            <nav className="flex flex-col space-y-2">
+              <Link href="/dashboard" className="text-sm px-2 py-1.5">
+                Dashboard
+              </Link>
+              <Link href="/about" className="text-sm px-2 py-1.5">
+                About
+              </Link>
+            </nav>
+          </SheetContent>
+        </Sheet>
+
+        {/* Auth Section */}
+        <div className="flex items-center gap-2">
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                avatarBox: "h-7 w-7",
+              },
+            }}
+          />
+          <SignedOut>
+            <SignInButton>
+              <Button variant="default" size="sm" className="h-7 text-xs px-3">
+                Sign in
+              </Button>
+            </SignInButton>
+          </SignedOut>
         </div>
       </div>
     </header>

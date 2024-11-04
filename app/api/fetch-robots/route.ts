@@ -8,13 +8,24 @@ const redis = new Redis({
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const url = searchParams.get("url");
+  let url = searchParams.get("url");
 
   if (!url) {
     return NextResponse.json(
       { error: "URL parameter is required" },
       { status: 400 }
     );
+  }
+
+  // Normalize the URL to ensure it starts with 'https://www.' and ends with '/robots.txt'
+  if (!/^https?:\/\//i.test(url)) {
+    url = `https://${url}`;
+  }
+  if (!/^https?:\/\/www\./i.test(url)) {
+    url = url.replace(/^https?:\/\//i, "https://www.");
+  }
+  if (!url.endsWith("/robots.txt")) {
+    url = `${url.replace(/\/+$/, "")}/robots.txt`;
   }
 
   try {
@@ -24,9 +35,7 @@ export async function GET(request: Request) {
       return NextResponse.json(JSON.parse(cachedResult as string));
     }
 
-    const robotsTxtUrl = new URL("/robots.txt", url).toString();
-    const response = await fetch(robotsTxtUrl);
-
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

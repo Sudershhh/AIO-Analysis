@@ -9,10 +9,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import RobotsAnalysis from "@/components/RobotsAnalysis";
 import HistorySidebar from "@/components/HistorySidebar";
-import Header from "@/components/Header";
+import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@clerk/nextjs";
 
 export default function Dashboard() {
+  const { toast } = useToast();
+
   const [url, setUrl] = useState("");
   const [data, setData] = useState<{
     robotsTxt: string;
@@ -45,6 +47,11 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Failed to fetch history:", error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Failed to fetch history.",
+      });
     }
   };
 
@@ -52,22 +59,42 @@ export default function Dashboard() {
     setError(null);
     setData(null);
     setLoading(true);
+
     try {
-      const formattedUrl = url.endsWith("robots.txt")
-        ? url
-        : `${url}/robots.txt`;
+      // Ensure the URL starts with 'https://www.' and ends with '/robots.txt'
+      let formattedUrl = url.trim();
+
+      if (!/^https?:\/\//i.test(formattedUrl)) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+
+      // Add 'www.' if it's not already present
+      if (!/^https?:\/\/www\./i.test(formattedUrl)) {
+        formattedUrl = formattedUrl.replace(/^https?:\/\//i, "https://www.");
+      }
+
+      if (!formattedUrl.endsWith("/robots.txt")) {
+        formattedUrl = `${formattedUrl.replace(/\/+$/, "")}/robots.txt`;
+      }
+
       const response = await fetch(
         `/api/fetch-robots?url=${encodeURIComponent(formattedUrl)}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch robots.txt");
       }
+
       const result = await response.json();
       setData(result);
       await saveToHistory(formattedUrl, result);
       await fetchHistory();
     } catch (error: any) {
       setError(error.message);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Failed to fetch robots.txt",
+      });
     } finally {
       setLoading(false);
     }
@@ -81,6 +108,11 @@ export default function Dashboard() {
         body: JSON.stringify({ url, data }),
       });
     } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Failed to save to history.",
+      });
       console.error("Failed to save to history:", error);
     }
   };
@@ -143,7 +175,7 @@ export default function Dashboard() {
               </p>
             </motion.div>
           )}
-
+          {/* 
           {error && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -154,7 +186,7 @@ export default function Dashboard() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             </motion.div>
-          )}
+          )} */}
 
           {data && (
             <motion.div
