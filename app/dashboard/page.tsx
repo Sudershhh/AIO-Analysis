@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import RobotsAnalysis from "@/components/RobotsAnalysis";
 import HistorySidebar from "@/components/HistorySidebar";
@@ -14,13 +13,14 @@ import { useUser } from "@clerk/nextjs";
 
 export default function Dashboard() {
   const { toast } = useToast();
-
   const [url, setUrl] = useState("");
   const [data, setData] = useState<{
     robotsTxt: string;
-    analysisResults: any;
+    analysisResults: {
+      directives: { allow: string[]; disallow: string[] };
+      recommendations: string[];
+    };
   } | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const { user, isLoaded, isSignedIn } = useUser();
@@ -56,23 +56,17 @@ export default function Dashboard() {
   };
 
   const fetchRobotsTxt = async () => {
-    setError(null);
     setData(null);
     setLoading(true);
 
     try {
-      // Ensure the URL starts with 'https://www.' and ends with '/robots.txt'
       let formattedUrl = url.trim();
-
       if (!/^https?:\/\//i.test(formattedUrl)) {
         formattedUrl = `https://${formattedUrl}`;
       }
-
-      // Add 'www.' if it's not already present
       if (!/^https?:\/\/www\./i.test(formattedUrl)) {
         formattedUrl = formattedUrl.replace(/^https?:\/\//i, "https://www.");
       }
-
       if (!formattedUrl.endsWith("/robots.txt")) {
         formattedUrl = `${formattedUrl.replace(/\/+$/, "")}/robots.txt`;
       }
@@ -86,10 +80,10 @@ export default function Dashboard() {
 
       const result = await response.json();
       setData(result);
+      setUrl(formattedUrl);
       await saveToHistory(formattedUrl, result);
       await fetchHistory();
     } catch (error: any) {
-      setError(error.message);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -126,6 +120,7 @@ export default function Dashboard() {
             setUrl(item.url);
             setData(item.data);
           }}
+          selectedUrl={url}
         />
         <main className="flex-1 p-8">
           <motion.h1
@@ -175,18 +170,6 @@ export default function Dashboard() {
               </p>
             </motion.div>
           )}
-          {/* 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            </motion.div>
-          )} */}
 
           {data && (
             <motion.div
@@ -197,6 +180,7 @@ export default function Dashboard() {
               <RobotsAnalysis
                 robotsTxt={data.robotsTxt}
                 analysisResults={data.analysisResults}
+                url={url}
               />
             </motion.div>
           )}

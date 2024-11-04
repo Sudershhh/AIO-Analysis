@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 const headlines = [
-  "AI Visibility",
+  "Website Visibility",
   "Search Performance",
   "Bot Accessibility",
   "Digital Presence",
@@ -142,13 +142,13 @@ export default function LandingPage() {
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-violet-500 via-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Button>
-            <Button
+            {/* <Button
               size="lg"
               variant="outline"
               className="border-2 border-gray-200 hover:border-violet-200 hover:bg-white/50 h-14 rounded-xl font-medium px-8 transition-all duration-300"
             >
               Watch Demo
-            </Button>
+            </Button> */}
           </motion.div>
         </motion.div>
 

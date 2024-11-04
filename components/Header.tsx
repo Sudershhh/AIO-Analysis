@@ -20,7 +20,7 @@ export default function Header() {
           className="text-sm font-semibold"
           aria-label="AIO Analysis Tool Home"
         >
-          <Image src="/favicon.png" alt="Logo" width={32} height={32} />
+          <Image src="/logo.png" alt="Logo" width={32} height={32} />
         </Link>
 
         {/* Desktop Navigation */}
@@ -72,7 +72,6 @@ export default function Header() {
         {/* Auth Section */}
         <div className="flex items-center gap-2">
           <UserButton
-            afterSignOutUrl="/"
             appearance={{
               elements: {
                 avatarBox: "h-7 w-7",
