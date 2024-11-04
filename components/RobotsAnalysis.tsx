@@ -61,6 +61,12 @@ export default function RobotsAnalysis({
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
+  useEffect(() => {
+    console.log("Active tab:", activeTab);
+    console.log("Url:", url);
+    gptRecommendations || fetchStoredRecommendations();
+  }, [activeTab]);
+
   const fetchStoredRecommendations = async () => {
     try {
       const response = await fetch(`/api/recommendations?url=${url}`);
@@ -68,6 +74,7 @@ export default function RobotsAnalysis({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log("Fetched stored recommendations:", data);
       if (data.recommendations && data.improvedRobotsTxt) {
         setGptRecommendations(data.recommendations);
         setImprovedRobotsTxt(data.improvedRobotsTxt);
@@ -108,6 +115,7 @@ export default function RobotsAnalysis({
       setLoading(false);
     }
   };
+
   const downloadTxtFile = () => {
     const element = document.createElement("a");
     const file = new Blob([improvedRobotsTxt || ""], { type: "text/plain" });

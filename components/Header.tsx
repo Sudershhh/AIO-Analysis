@@ -17,10 +17,11 @@ export default function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-sm font-semibold"
+          className="text-sm font-semibold flex items-center"
           aria-label="AIO Analysis Tool Home"
         >
           <Image src="/logo.png" alt="Logo" width={32} height={32} />
+          <span className="ml-2 text-xl">AIO</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -59,10 +60,10 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="right" className="w-48">
             <nav className="flex flex-col space-y-2">
-              <Link href="/dashboard" className="text-sm px-2 py-1.5">
+              <Link href="/dashboard" className="text-sm px-2 py-1.5 font-bold">
                 Dashboard
               </Link>
-              <Link href="/about" className="text-sm px-2 py-1.5">
+              <Link href="/about" className="text-sm px-2 py-1.5 font-bold">
                 About
               </Link>
             </nav>
@@ -80,8 +81,12 @@ export default function Header() {
           />
           <SignedOut>
             <SignInButton>
-              <Button variant="default" size="sm" className="h-7 text-xs px-3">
-                Sign in
+              <Button
+                variant="default"
+                size="sm"
+                className="h-7 text-xs px-3 font-bold"
+              >
+                Sign In
               </Button>
             </SignInButton>
           </SignedOut>
