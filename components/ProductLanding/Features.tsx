@@ -1,6 +1,14 @@
 import { Card, CardContent } from "../ui/card";
-import { features } from "@/config/landingPage";
 import { motion } from "framer-motion";
+import { features } from "@/config/landingPage";
+const featureGradients = [
+  " from-violet-500 to-purple-500",
+  "from-blue-500 to-cyan-500",
+  "from-cyan-500 to-teal-500",
+  "from-indigo-500 to-purple-500",
+  "from-pink-500 to-rose-500",
+  "from-orange-500 to-yellow-500",
+];
 
 function Features() {
   return (
@@ -23,7 +31,7 @@ function Features() {
             <Card className="h-full">
               <CardContent className="p-6">
                 <div
-                  className={`rounded-xl bg-gradient-to-r ${feature.gradient} p-3 w-12 h-12 mb-4`}
+                  className={`rounded-xl bg-gradient-to-r ${featureGradients[featureIndex]} p-3 w-12 h-12 mb-4`}
                 >
                   <feature.icon
                     className="h-6 w-6 text-white"

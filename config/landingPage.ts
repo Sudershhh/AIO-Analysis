@@ -60,42 +60,36 @@ export const features = [
     title: "AI-Powered Analysis",
     description:
       "Real-time analysis of your robots.txt and site structure using advanced machine learning algorithms",
-    gradient: "from-violet-500 to-purple-500",
   },
   {
     icon: Zap,
     title: "Instant Optimization",
     description:
       "One-click implementation of AI-recommended improvements with automatic validation",
-    gradient: "from-blue-500 to-cyan-500",
   },
   {
     icon: Rocket,
     title: "Enhanced Visibility",
     description:
       "Boost your site's presence across AI-powered search engines and crawlers",
-    gradient: "from-cyan-500 to-teal-500",
   },
   {
     icon: Shield,
     title: "Security First",
     description:
       "Ensure your robots.txt properly protects sensitive content while maximizing visibility",
-    gradient: "from-indigo-500 to-purple-500",
   },
   {
     icon: Search,
     title: "Deep Insights",
     description:
       "Comprehensive analysis of crawler behavior and optimization opportunities",
-    gradient: "from-blue-500 to-indigo-500",
   },
   {
     icon: Code,
     title: "Custom Rules",
     description:
       "Create and test custom robots.txt rules with real-time validation",
-    gradient: "from-violet-500 to-indigo-500",
   },
 ];
 
