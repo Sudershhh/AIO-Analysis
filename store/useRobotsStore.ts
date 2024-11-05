@@ -39,21 +39,29 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
       const response = await fetch(
         `/api/robots?url=${encodeURIComponent(normalizedUrl)}`
       );
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to fetch robots.txt");
+        // Handle specific error for already analyzed URLs
+        if (
+          response.status === 400 &&
+          data.error?.includes("already analyzed")
+        ) {
+          throw new Error("You have already analyzed this robots.txt file");
+        }
+        throw new Error(data.error || "Failed to fetch robots.txt");
       }
 
-      const result = await response.json();
-      setRobotsTxt(result.robotsTxt);
-      setAnalysisResults(result.analysisResults);
+      setRobotsTxt(data.robotsTxt);
+      setAnalysisResults(data.analysisResults);
       setUrl(normalizedUrl);
-      await saveToHistory(normalizedUrl, result);
+      await saveToHistory(normalizedUrl, data);
       await fetchHistory();
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: "Failed to fetch robots.txt",
+        description: error.message || "An unexpected error occurred",
       });
     } finally {
       setLoading(false);
@@ -67,7 +75,6 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
         set({ history: historyData });
       }
     } catch (error) {
-      console.error("Failed to fetch history:", error);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -88,7 +95,6 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
         title: "Uh oh! Something went wrong.",
         description: "Failed to save to history.",
       });
-      console.error("Failed to save to history:", error);
     }
   },
 
@@ -112,7 +118,6 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
       setGptRecommendations(data.recommendations);
       setImprovedRobotsTxt(data.improvedRobotsTxt);
     } catch (error) {
-      console.error("Error generating recommendations:", error);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",

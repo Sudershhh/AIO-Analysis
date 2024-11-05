@@ -20,14 +20,15 @@ export async function GET(request: Request) {
 
   const normalizedUrl = normalizeURL(url);
 
-  console.log("Normalized URL:", normalizedUrl);
-
   try {
     // Check cache first
+
     const cachedResult = await redis.get(`robots:${normalizedUrl}`);
-    console.log("Cached Result:", cachedResult);
     if (cachedResult) {
-      return NextResponse.json(cachedResult as string);
+      return NextResponse.json(
+        { error: "Oops! You have already analyzed this robots.txt" },
+        { status: 400 }
+      );
     }
 
     const response = await fetch(normalizedUrl);
@@ -35,11 +36,8 @@ export async function GET(request: Request) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    console.log("Response:", response);
     const robotsTxt = await response.text();
     const analysisResults = analyzeRobotsTxt(robotsTxt);
-
-    console.log("Analysis Results:", analysisResults);
 
     const result = { robotsTxt, analysisResults };
 

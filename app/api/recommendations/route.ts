@@ -80,15 +80,10 @@ export async function POST(request: Request) {
 
     let normalizedUrl = normalizeURL(url);
 
-    console.log("Original URL:", url);
-    console.log("Normalized URL:", normalizedUrl);
-
     // Fetch from Redis cache
     const cachedRecommendations = await redis.get(
       `recommendations:${userId}:${normalizedUrl}`
     );
-
-    console.log("Cached recommendations:", cachedRecommendations);
 
     if (cachedRecommendations) {
       return NextResponse.json(cachedRecommendations as string);

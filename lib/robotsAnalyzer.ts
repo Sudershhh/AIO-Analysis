@@ -18,7 +18,6 @@ export function analyzeRobotsTxt(robotsTxt: string) {
       }
     }
   });
-  console.log(directives);
   const recommendations = generateRecommendations(directives);
   return { directives, recommendations };
 }
