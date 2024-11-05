@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,82 +31,32 @@ import {
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
 import { useToast } from "@/hooks/use-toast";
+import { useRobotsStore } from "@/store/useRobotsStore";
 
-interface RobotsAnalysisProps {
-  robotsTxt: string;
-  analysisResults: {
-    directives: { allow: string[]; disallow: string[] };
-    recommendations: string[];
-  };
-  url: string;
-}
-
-export default function RobotsAnalysis({
-  robotsTxt,
-  analysisResults,
-  url,
-}: RobotsAnalysisProps) {
+export default function RobotsAnalysis() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("content");
-  const [gptRecommendations, setGptRecommendations] = useState<string[] | null>(
-    null
-  );
-  const [improvedRobotsTxt, setImprovedRobotsTxt] = useState<string | null>(
-    null
-  );
-  const [loading, setLoading] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
+  const {
+    robotsTxt,
+    analysisResults,
+    url,
+    gptRecommendations,
+    improvedRobotsTxt,
+    loading,
+    // fetchStoredRecommendations,
+    generateRecommendations,
+  } = useRobotsStore();
+
+  const [activeTab, setActiveTab] = useState("content");
+  const [showConfetti, setShowConfetti] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
-  const fetchStoredRecommendations = async () => {
-    try {
-      const response = await fetch(`/api/recommendations?url=${url}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.recommendations && data.improvedRobotsTxt) {
-        setGptRecommendations(data.recommendations);
-        setImprovedRobotsTxt(data.improvedRobotsTxt);
-      }
-    } catch (error) {
-      console.error("Error fetching stored recommendations:", error);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Failed to fetch recommendations. Please try again.",
-      });
-    }
-  };
-  const generateRecommendations = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/recommendations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ robotsTxt, analysisResults, url }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setGptRecommendations(data.recommendations);
-      setImprovedRobotsTxt(data.improvedRobotsTxt);
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000);
-    } catch (error) {
-      console.error("Error generating recommendations:", error);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Failed to generate recommendations. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleGenerateRecommendations = async () => {
+    await generateRecommendations(robotsTxt, analysisResults, url);
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 5000);
   };
 
   const downloadTxtFile = () => {
@@ -128,13 +78,15 @@ export default function RobotsAnalysis({
     });
   };
 
-  const filteredAllowDirectives = analysisResults.directives.allow.filter(
-    (directive) => directive.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAllowDirectives =
+    analysisResults?.directives.allow.filter((directive) =>
+      directive.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
-  const filteredDisallowDirectives = analysisResults.directives.disallow.filter(
-    (directive) => directive.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDisallowDirectives =
+    analysisResults?.directives.disallow.filter((directive) =>
+      directive.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
   const totalPages = Math.ceil(
     Math.max(
@@ -168,7 +120,7 @@ export default function RobotsAnalysis({
             </TabsTrigger>
             <TabsTrigger
               value="recommendations"
-              className="rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              className="rounded-md data-[state=active]:bg-white  data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
             >
               Recommendations
             </TabsTrigger>
@@ -250,22 +202,22 @@ export default function RobotsAnalysis({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <Button
-                    onClick={fetchStoredRecommendations}
+                  {/* <Button
+                    onClick={() => fetchStoredRecommendations(url)}
                     disabled={loading}
                     className="bg-gray-700 text-white hover:bg-gray-600 mr-4"
                   >
                     Fetch Stored Recommendations
-                  </Button>
+                  </Button> */}
                   <Button
-                    onClick={generateRecommendations}
+                    onClick={handleGenerateRecommendations}
                     disabled={loading}
                     className="bg-gray-900 text-white hover:bg-gray-800"
                   >
                     {loading ? (
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ) : null}
-                    Generate AI Recommendations
+                    Get AI Recommendations
                   </Button>
                 </motion.div>
               ) : (

@@ -4,24 +4,18 @@ import { ChevronRight, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useRobotsStore } from "@/store/useRobotsStore";
 
-interface HistoryItem {
-  url: string;
-  data: any;
-  timestamp: string;
-}
-
-interface HistorySidebarProps {
-  history: HistoryItem[];
-  onSelectHistory: (item: HistoryItem) => void;
-  selectedUrl?: string;
-}
-
-export default function HistorySidebar({
-  history,
-  onSelectHistory,
-  selectedUrl,
-}: HistorySidebarProps) {
+export default function HistorySidebar() {
+  const {
+    history,
+    url: selectedUrl,
+    setUrl,
+    setRobotsTxt,
+    setAnalysisResults,
+    setGptRecommendations,
+    setImprovedRobotsTxt,
+  } = useRobotsStore();
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredHistory = useMemo(
@@ -31,6 +25,14 @@ export default function HistorySidebar({
       ),
     [searchQuery, history]
   );
+
+  const handleSelectHistory = (item: any) => {
+    setUrl(item.url);
+    setRobotsTxt(item.data.robotsTxt);
+    setAnalysisResults(item.data.analysisResults);
+    setGptRecommendations(null);
+    setImprovedRobotsTxt(null);
+  };
 
   return (
     <div className="w-72 h-screen border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex flex-col overflow-y-auto">
@@ -70,7 +72,7 @@ export default function HistorySidebar({
                   }
                   transition-all duration-200 ease-in-out
                 `}
-                  onClick={() => onSelectHistory(item)}
+                  onClick={() => handleSelectHistory(item)}
                 >
                   <div className="flex items-start justify-between w-full">
                     <div className="min-w-0 flex-1">

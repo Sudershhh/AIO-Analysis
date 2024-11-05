@@ -13,6 +13,22 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function normalizeURL(url: string) {
+  if (!url) {
+    return url;
+  }
+  if (!/^https?:\/\//i.test(url)) {
+    url = `https://${url}`;
+  }
+  if (!/^https?:\/\/www\./i.test(url)) {
+    url = url.replace(/^https?:\/\//i, "https://www.");
+  }
+  if (!url.endsWith("/robots.txt")) {
+    url = `${url.replace(/\/+$/, "")}/robots.txt`;
+  }
+  return url;
+}
+
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
@@ -30,24 +46,22 @@ export async function GET(request: Request) {
       );
     }
 
-    if (!/^https?:\/\//i.test(url)) {
-      url = `https://${url}`;
-    }
-    if (!/^https?:\/\/www\./i.test(url)) {
-      url = url.replace(/^https?:\/\//i, "https://www.");
-    }
-    if (!url.endsWith("/robots.txt")) {
-      url = `${url.replace(/\/+$/, "")}/robots.txt`;
-    }
+    // if (!/^https?:\/\//i.test(url)) {
+    //   url = `https://${url}`;
+    // }
+    // if (!/^https?:\/\/www\./i.test(url)) {
+    //   url = url.replace(/^https?:\/\//i, "https://www.");
+    // }
+    // if (!url.endsWith("/robots.txt")) {
+    //   url = `${url.replace(/\/+$/, "")}/robots.txt`;
+    // }
 
-    console.log("Fetching recommendations for URL:", url);
+    let normalizedUrl = normalizeURL(url);
 
     // Fetch from Redis cache
     const cachedRecommendations = await redis.get(
-      `recommendations:${userId}:${url}`
+      `recommendations:${userId}:${normalizedUrl}`
     );
-
-    console.log("Cached recommendations:", typeof cachedRecommendations);
 
     if (cachedRecommendations) {
       try {
@@ -90,6 +104,22 @@ export async function POST(request: Request) {
       );
     }
 
+    let normalizedUrl = normalizeURL(url);
+
+    console.log("Original URL:", url);
+    console.log("Normalized URL:", normalizedUrl);
+
+    // Fetch from Redis cache
+    const cachedRecommendations = await redis.get(
+      `recommendations:${userId}:${normalizedUrl}`
+    );
+
+    console.log("Cached recommendations:", cachedRecommendations);
+
+    if (cachedRecommendations) {
+      return NextResponse.json(cachedRecommendations as string);
+    }
+
     const prompt = `
       As an AI expert in SEO and web crawling, analyze the following robots.txt content and provide recommendations for optimizing it for AI accessibility:
 
@@ -125,7 +155,7 @@ export async function POST(request: Request) {
 
     // Store recommendations in Redis
     await redis.set(
-      `recommendations:${userId}:${url}`,
+      `recommendations:${userId}:${normalizedUrl}`,
       JSON.stringify(response),
       { ex: 86400 }
     );

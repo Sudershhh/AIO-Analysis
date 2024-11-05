@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -8,21 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import RobotsAnalysis from "@/components/RobotsAnalysis";
 import HistorySidebar from "@/components/HistorySidebar";
-import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@clerk/nextjs";
+import { useRobotsStore } from "@/store/useRobotsStore";
 
 export default function Dashboard() {
-  const { toast } = useToast();
-  const [url, setUrl] = useState("");
-  const [data, setData] = useState<{
-    robotsTxt: string;
-    analysisResults: {
-      directives: { allow: string[]; disallow: string[] };
-      recommendations: string[];
-    };
-  } | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<any[]>([]);
+  const {
+    url,
+    setUrl,
+    loading,
+    fetchRobotsTxt,
+    fetchHistory,
+    robotsTxt,
+    analysisResults,
+  } = useRobotsStore();
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
@@ -36,92 +34,12 @@ export default function Dashboard() {
     if (user) {
       fetchHistory();
     }
-  }, [user]);
-
-  const fetchHistory = async () => {
-    try {
-      const response = await fetch("/api/history");
-      if (response.ok) {
-        const historyData = await response.json();
-        setHistory(historyData);
-      }
-    } catch (error) {
-      console.error("Failed to fetch history:", error);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Failed to fetch history.",
-      });
-    }
-  };
-
-  const fetchRobotsTxt = async () => {
-    setData(null);
-    setLoading(true);
-
-    try {
-      let formattedUrl = url.trim();
-      if (!/^https?:\/\//i.test(formattedUrl)) {
-        formattedUrl = `https://${formattedUrl}`;
-      }
-      if (!/^https?:\/\/www\./i.test(formattedUrl)) {
-        formattedUrl = formattedUrl.replace(/^https?:\/\//i, "https://www.");
-      }
-      if (!formattedUrl.endsWith("/robots.txt")) {
-        formattedUrl = `${formattedUrl.replace(/\/+$/, "")}/robots.txt`;
-      }
-
-      const response = await fetch(
-        `/api/fetch-robots?url=${encodeURIComponent(formattedUrl)}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch robots.txt");
-      }
-
-      const result = await response.json();
-      setData(result);
-      setUrl(formattedUrl);
-      await saveToHistory(formattedUrl, result);
-      await fetchHistory();
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Failed to fetch robots.txt",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const saveToHistory = async (url: string, data: any) => {
-    try {
-      await fetch("/api/history", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, data }),
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Failed to save to history.",
-      });
-      console.error("Failed to save to history:", error);
-    }
-  };
+  }, [user, fetchHistory]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
-        <HistorySidebar
-          history={history}
-          onSelectHistory={(item) => {
-            setUrl(item.url);
-            setData(item.data);
-          }}
-          selectedUrl={url}
-        />
+        <HistorySidebar />
         <main className="flex-1 p-8">
           <motion.h1
             className="text-3xl font-bold text-center mb-8 text-gray-900"
@@ -146,7 +64,7 @@ export default function Dashboard() {
               aria-label="Website URL input"
             />
             <Button
-              onClick={fetchRobotsTxt}
+              onClick={() => fetchRobotsTxt(url)}
               disabled={loading || !url}
               className="bg-gray-900 text-white hover:bg-gray-800"
             >
@@ -157,7 +75,7 @@ export default function Dashboard() {
             </Button>
           </motion.div>
 
-          {loading && (
+          {/* {loading && (
             <motion.div
               className="text-center py-12"
               initial={{ opacity: 0 }}
@@ -169,19 +87,15 @@ export default function Dashboard() {
                 Analyzing robots.txt...
               </p>
             </motion.div>
-          )}
+          )} */}
 
-          {data && (
+          {robotsTxt && analysisResults && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <RobotsAnalysis
-                robotsTxt={data.robotsTxt}
-                analysisResults={data.analysisResults}
-                url={url}
-              />
+              <RobotsAnalysis />
             </motion.div>
           )}
         </main>
