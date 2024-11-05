@@ -43,6 +43,7 @@ export default function RobotsAnalysis() {
     gptRecommendations,
     improvedRobotsTxt,
     loading,
+    recommendationsLoading,
     generateRecommendations,
   } = useRobotsStore();
 
@@ -202,10 +203,10 @@ export default function RobotsAnalysis() {
                 >
                   <Button
                     onClick={handleGenerateRecommendations}
-                    disabled={loading}
+                    disabled={recommendationsLoading}
                     className="bg-gray-900 text-white hover:bg-gray-800"
                   >
-                    {loading ? (
+                    {recommendationsLoading ? (
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ) : null}
                     Get AI Recommendations

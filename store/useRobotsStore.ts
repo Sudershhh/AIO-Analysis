@@ -10,6 +10,7 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
   gptRecommendations: null,
   improvedRobotsTxt: null,
   loading: false,
+  recommendationsLoading: false,
   history: [],
   setUrl: (url) => set({ url }),
   setRobotsTxt: (robotsTxt) => set({ robotsTxt }),
@@ -18,6 +19,8 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
     set({ gptRecommendations: recommendations }),
   setImprovedRobotsTxt: (improvedRobotsTxt) => set({ improvedRobotsTxt }),
   setLoading: (loading) => set({ loading }),
+  setRecommendationsLoading: (recommendationsLoading) =>
+    set({ recommendationsLoading }),
   setHistory: (history) => set({ history }),
 
   fetchRobotsTxt: async (url) => {
@@ -90,8 +93,12 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
   },
 
   generateRecommendations: async (robotsTxt, analysisResults, url) => {
-    const { setLoading, setGptRecommendations, setImprovedRobotsTxt } = get();
-    setLoading(true);
+    const {
+      setRecommendationsLoading,
+      setGptRecommendations,
+      setImprovedRobotsTxt,
+    } = get();
+    setRecommendationsLoading(true);
     try {
       const response = await fetch("/api/recommendations", {
         method: "POST",
@@ -112,7 +119,7 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
         description: "Failed to generate recommendations. Please try again.",
       });
     } finally {
-      setLoading(false);
+      setRecommendationsLoading(false);
     }
   },
 }));
