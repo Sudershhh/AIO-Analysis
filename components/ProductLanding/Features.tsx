@@ -12,9 +12,9 @@ function Features() {
         Powerful Features
       </h2>
       <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {features.map((feature) => (
+        {features.map((feature, featureIndex) => (
           <motion.div
-            key={feature.title}
+            key={`${feature.title}-${featureIndex}`}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

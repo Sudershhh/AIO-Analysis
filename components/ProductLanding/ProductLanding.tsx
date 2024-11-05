@@ -12,10 +12,11 @@ import Testimonials from "./Testimonials";
 import PricingSection from "./PricingSection";
 import Analytics from "./Analytics";
 import Faq from "./Faq";
+import { useRouter } from "next/navigation";
 
 function ProductLanding() {
   const [headlineIndex, setHeadlineIndex] = useState(0);
-
+  const router = useRouter();
   useEffect(() => {
     const interval = setInterval(() => {
       setHeadlineIndex((prev) => (prev + 1) % headlines.length);
@@ -119,6 +120,7 @@ function ProductLanding() {
               <Button
                 size="lg"
                 className="group relative overflow-hidden bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-600 hover:opacity-90 text-white px-8 h-14 rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-300"
+                onClick={() => router.push("/dashboard")}
               >
                 <span className="relative z-10 flex items-center justify-center font-medium">
                   Start Optimizing Free

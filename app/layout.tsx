@@ -21,7 +21,7 @@ export default function RootLayout({
           <link rel="icon" href="/logo.png"></link>
         </head>
         <body className={` antialiased`}>
-          <Header />
+          {/* <Header /> */}
           {children}
           <Toaster />
         </body>

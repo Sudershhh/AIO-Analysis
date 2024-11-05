@@ -24,7 +24,7 @@ export default function Header() {
           className="text-sm font-semibold flex items-center"
           aria-label="AIO Analysis Tool Home"
         >
-          <Image src="/logo.png" alt="" width={32} height={32} />
+          <Image src="/logo.png" alt="AIO Logo" width={32} height={32} />
           <span className="ml-2 text-xl">AIO</span>
         </Link>
 
@@ -61,7 +61,7 @@ export default function Header() {
             }}
           />
           <SignedOut>
-            <SignInButton>
+            <SignInButton forceRedirectUrl={"/dashboard"}>
               <Button
                 variant="default"
                 size="sm"
@@ -81,10 +81,9 @@ export default function Header() {
                 avatarBox: "h-7 w-7",
               },
             }}
-            afterSignOutUrl="/"
           />
           <SignedOut>
-            <SignInButton>
+            <SignInButton fallbackRedirectUrl={"/dashboard"}>
               <Button
                 variant="default"
                 size="sm"

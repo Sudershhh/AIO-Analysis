@@ -10,6 +10,7 @@ import RobotsAnalysis from "@/components/RobotsAnalysis";
 import HistorySidebar from "@/components/HistorySidebar";
 import { useUser } from "@clerk/nextjs";
 import { useRobotsStore } from "@/store/useRobotsStore";
+import Header from "@/components/Header";
 
 export default function Dashboard() {
   const {
@@ -38,6 +39,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
       <div className="flex">
         <HistorySidebar />
         <main className="flex-1 p-8">
