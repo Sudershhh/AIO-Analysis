@@ -75,20 +75,6 @@ export default function Dashboard() {
             </Button>
           </motion.div>
 
-          {/* {loading && (
-            <motion.div
-              className="text-center py-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <Loader2 className="h-12 w-12 animate-spin mx-auto text-gray-600" />
-              <p className="mt-4 text-lg text-gray-600">
-                Analyzing robots.txt...
-              </p>
-            </motion.div>
-          )} */}
-
           {robotsTxt && analysisResults && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

@@ -1,9 +1,9 @@
-import LandingPage from "@/components/LandingPage";
+import ProductLanding from "@/components/ProductLanding";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <LandingPage />
+      <ProductLanding />
     </main>
   );
 }

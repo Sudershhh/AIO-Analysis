@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
+import { normalizeURL } from "@/utils/url";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -8,7 +9,7 @@ const redis = new Redis({
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  let url = searchParams.get("url");
+  const url = searchParams.get("url");
 
   if (!url) {
     return NextResponse.json(
@@ -17,25 +18,16 @@ export async function GET(request: Request) {
     );
   }
 
-  // Normalize the URL to ensure it starts with 'https://www.' and ends with '/robots.txt'
-  if (!/^https?:\/\//i.test(url)) {
-    url = `https://${url}`;
-  }
-  if (!/^https?:\/\/www\./i.test(url)) {
-    url = url.replace(/^https?:\/\//i, "https://www.");
-  }
-  if (!url.endsWith("/robots.txt")) {
-    url = `${url.replace(/\/+$/, "")}/robots.txt`;
-  }
+  const normalizedUrl = normalizeURL(url);
 
   try {
     // Check cache first
-    const cachedResult = await redis.get(`robots:${url}`);
+    const cachedResult = await redis.get(`robots:${normalizedUrl}`);
     if (cachedResult) {
       return NextResponse.json(JSON.parse(cachedResult as string));
     }
 
-    const response = await fetch(url);
+    const response = await fetch(normalizedUrl);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -46,7 +38,9 @@ export async function GET(request: Request) {
     const result = { robotsTxt, analysisResults };
 
     // Cache the result
-    await redis.set(`robots:${url}`, JSON.stringify(result), { ex: 86400 }); // Cache for 24 hours
+    await redis.set(`robots:${normalizedUrl}`, JSON.stringify(result), {
+      ex: 86400,
+    }); // Cache for 24 hours
 
     return NextResponse.json(result);
   } catch (error) {

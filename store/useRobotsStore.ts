@@ -1,35 +1,7 @@
 import { create } from "zustand";
 import { toast } from "@/hooks/use-toast";
-
-interface RobotsState {
-  url: string;
-  robotsTxt: string;
-  analysisResults: {
-    directives: { allow: string[]; disallow: string[] };
-    recommendations: string[];
-  } | null;
-  gptRecommendations: string[] | null;
-  improvedRobotsTxt: string | null;
-  loading: boolean;
-  history: any[];
-  // selectedHistory: string | null;
-  setUrl: (url: string) => void;
-  setRobotsTxt: (robotsTxt: string) => void;
-  setAnalysisResults: (analysisResults: RobotsState["analysisResults"]) => void;
-  setGptRecommendations: (recommendations: string[] | null) => void;
-  setImprovedRobotsTxt: (improvedRobotsTxt: string | null) => void;
-  setLoading: (loading: boolean) => void;
-  setHistory: (history: any[]) => void;
-  fetchRobotsTxt: (url: string) => Promise<void>;
-  fetchHistory: () => Promise<void>;
-  saveToHistory: (url: string, data: any) => Promise<void>;
-  // fetchStoredRecommendations: (url: string) => Promise<void>;
-  generateRecommendations: (
-    robotsTxt: string,
-    analysisResults: RobotsState["analysisResults"],
-    url: string
-  ) => Promise<void>;
-}
+import { RobotsState } from "@/interfaces/robotsState";
+import { normalizeURL } from "@/utils/url";
 
 export const useRobotsStore = create<RobotsState>((set, get) => ({
   url: "",
@@ -47,7 +19,6 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
   setImprovedRobotsTxt: (improvedRobotsTxt) => set({ improvedRobotsTxt }),
   setLoading: (loading) => set({ loading }),
   setHistory: (history) => set({ history }),
-  // selectedHistory: null,
 
   fetchRobotsTxt: async (url) => {
     const {
@@ -60,19 +31,10 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
     } = get();
     setLoading(true);
     try {
-      let formattedUrl = url.trim();
-      if (!/^https?:\/\//i.test(formattedUrl)) {
-        formattedUrl = `https://${formattedUrl}`;
-      }
-      if (!/^https?:\/\/www\./i.test(formattedUrl)) {
-        formattedUrl = formattedUrl.replace(/^https?:\/\//i, "https://www.");
-      }
-      if (!formattedUrl.endsWith("/robots.txt")) {
-        formattedUrl = `${formattedUrl.replace(/\/+$/, "")}/robots.txt`;
-      }
+      const normalizedUrl = normalizeURL(url.trim());
 
       const response = await fetch(
-        `/api/fetch-robots?url=${encodeURIComponent(formattedUrl)}`
+        `/api/fetch-robots?url=${encodeURIComponent(normalizedUrl)}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch robots.txt");
@@ -81,8 +43,8 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
       const result = await response.json();
       setRobotsTxt(result.robotsTxt);
       setAnalysisResults(result.analysisResults);
-      setUrl(formattedUrl);
-      await saveToHistory(formattedUrl, result);
+      setUrl(normalizedUrl);
+      await saveToHistory(normalizedUrl, result);
       await fetchHistory();
     } catch (error: any) {
       toast({
@@ -126,30 +88,7 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
       console.error("Failed to save to history:", error);
     }
   },
-  // fetchStoredRecommendations: async (url) => {
-  //   try {
-  //     const response = await fetch(
-  //       `/api/recommendations?url=${encodeURIComponent(url)}`
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-  //     const data = await response.json();
-  //     if (data.recommendations && data.improvedRobotsTxt) {
-  //       set({
-  //         gptRecommendations: data.recommendations,
-  //         improvedRobotsTxt: data.improvedRobotsTxt,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching stored recommendations:", error);
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Uh oh! Something went wrong.",
-  //       description: "Failed to fetch recommendations. Please try again.",
-  //     });
-  //   }
-  // },
+
   generateRecommendations: async (robotsTxt, analysisResults, url) => {
     const { setLoading, setGptRecommendations, setImprovedRobotsTxt } = get();
     setLoading(true);

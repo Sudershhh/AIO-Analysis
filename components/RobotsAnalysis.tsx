@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +32,7 @@ import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
 import { useToast } from "@/hooks/use-toast";
 import { useRobotsStore } from "@/store/useRobotsStore";
-
+import { downloadTextFile } from "@/utils/file";
 export default function RobotsAnalysis() {
   const { toast } = useToast();
   const { width, height } = useWindowSize();
@@ -43,7 +43,6 @@ export default function RobotsAnalysis() {
     gptRecommendations,
     improvedRobotsTxt,
     loading,
-    // fetchStoredRecommendations,
     generateRecommendations,
   } = useRobotsStore();
 
@@ -59,41 +58,40 @@ export default function RobotsAnalysis() {
     setTimeout(() => setShowConfetti(false), 5000);
   };
 
-  const downloadTxtFile = () => {
-    const element = document.createElement("a");
-    const file = new Blob([improvedRobotsTxt || ""], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = "improved_robots.txt";
-    document.body.appendChild(element);
-    element.click();
-  };
-
-  const copyToClipboard = () => {
+  const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(improvedRobotsTxt || "").then(() => {
       toast({
         title: "Copied to clipboard",
+
         description:
           "The improved robots.txt content has been copied to your clipboard.",
       });
     });
-  };
+  }, [improvedRobotsTxt]);
 
-  const filteredAllowDirectives =
-    analysisResults?.directives.allow.filter((directive) =>
-      directive.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
+  const filteredAllowDirectives = useMemo(() => {
+    const allowDirectives = analysisResults?.directives.allow;
+    return allowDirectives
+      ? allowDirectives.filter((directive) =>
+          directive.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : [];
+  }, [searchQuery, analysisResults?.directives.allow]);
 
-  const filteredDisallowDirectives =
-    analysisResults?.directives.disallow.filter((directive) =>
-      directive.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
+  const filteredDisallowDirectives = useMemo(() => {
+    const disallowDirectives = analysisResults?.directives.disallow;
+    return disallowDirectives
+      ? disallowDirectives.filter((directive) =>
+          directive.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : [];
+  }, [searchQuery, analysisResults?.directives.disallow]);
 
-  const totalPages = Math.ceil(
-    Math.max(
-      filteredAllowDirectives.length,
-      filteredDisallowDirectives.length
-    ) / itemsPerPage
-  );
+  const totalPages = useMemo(() => {
+    const allowLength = filteredAllowDirectives.length;
+    const disallowLength = filteredDisallowDirectives.length;
+    return Math.ceil(Math.max(allowLength, disallowLength) / itemsPerPage);
+  }, [filteredAllowDirectives, filteredDisallowDirectives, itemsPerPage]);
 
   return (
     <Card className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
@@ -202,13 +200,6 @@ export default function RobotsAnalysis() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {/* <Button
-                    onClick={() => fetchStoredRecommendations(url)}
-                    disabled={loading}
-                    className="bg-gray-700 text-white hover:bg-gray-600 mr-4"
-                  >
-                    Fetch Stored Recommendations
-                  </Button> */}
                   <Button
                     onClick={handleGenerateRecommendations}
                     disabled={loading}
@@ -243,7 +234,9 @@ export default function RobotsAnalysis() {
                         </h3>
                         <div className="flex space-x-2">
                           <Button
-                            onClick={downloadTxtFile}
+                            onClick={() =>
+                              downloadTextFile(improvedRobotsTxt, url)
+                            }
                             className="flex items-center bg-gray-700 text-white hover:bg-gray-600"
                           >
                             <Download className="mr-2 h-4 w-4" /> Download
