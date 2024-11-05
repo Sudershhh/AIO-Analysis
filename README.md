@@ -47,6 +47,9 @@ AIO Analysis follows a serverless, event-driven architecture to optimize scalabi
 - **Redis**: Acts as the central cache layer to store and retrieve recommendations and history, minimizing database dependency and reducing API response times.
 - **AI Recommendation Service**: Processes requests for new recommendations using OPEN AI's GPT 3.5 Turbo.
 
+![AIO - Architecture](https://github.com/user-attachments/assets/24e56231-638f-4532-aeab-1b4133845501)
+
+
 ---
 
 ## Getting Started
