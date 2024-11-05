@@ -1,4 +1,4 @@
-import ProductLanding from "@/components/ProductLanding";
+import ProductLanding from "@/components/ProductLanding/ProductLanding";
 
 export default function Home() {
   return (

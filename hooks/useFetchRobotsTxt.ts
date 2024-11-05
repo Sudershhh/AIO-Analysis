@@ -17,7 +17,7 @@ export const useFetchRobotsTxt = (url: string) => {
 
       try {
         const response = await fetch(
-          `/api/fetch-robots?url=${encodeURIComponent(url)}`,
+          `/api/robots?url=${encodeURIComponent(url)}`,
           {
             signal: controller.signal,
           }

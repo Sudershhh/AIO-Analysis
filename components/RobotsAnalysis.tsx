@@ -42,7 +42,6 @@ export default function RobotsAnalysis() {
     url,
     gptRecommendations,
     improvedRobotsTxt,
-    loading,
     recommendationsLoading,
     generateRecommendations,
   } = useRobotsStore();

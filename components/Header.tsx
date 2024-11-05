@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { UserButton, SignedOut, SignInButton } from "@clerk/nextjs";
+import { UserButton, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -11,6 +13,8 @@ import { Menu } from "lucide-react";
 import Image from "next/image";
 
 export default function Header() {
+  const { isSignedIn } = useUser();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-12 items-center justify-between px-3">
@@ -20,58 +24,35 @@ export default function Header() {
           className="text-sm font-semibold flex items-center"
           aria-label="AIO Analysis Tool Home"
         >
-          <Image src="/logo.png" alt="Logo" width={32} height={32} />
+          <Image src="/logo.png" alt="" width={32} height={32} />
           <span className="ml-2 text-xl">AIO</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList className="gap-1">
-            <NavigationMenuItem>
-              <Link
-                href="/dashboard"
-                className="text-sm px-2 py-1 rounded hover:bg-accent"
-              >
-                Dashboard
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link
-                href="/about"
-                className="text-sm px-2 py-1 rounded hover:bg-accent"
-              >
-                About
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        {/* Desktop Navigation and Auth Section */}
+        <div className="hidden md:flex items-center space-x-4">
+          <NavigationMenu>
+            <NavigationMenuList className="gap-1">
+              {isSignedIn ? (
+                <NavigationMenuItem>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm px-2 py-1 rounded hover:bg-accent"
+                  >
+                    Dashboard
+                  </Link>
+                </NavigationMenuItem>
+              ) : null}
+              <NavigationMenuItem>
+                <Link
+                  href="/about"
+                  className="text-sm px-2 py-1 rounded hover:bg-accent"
+                >
+                  About
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
-        {/* Mobile Navigation */}
-        <Sheet>
-          <SheetTrigger asChild className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1"
-              aria-label="Open menu"
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-48">
-            <nav className="flex flex-col space-y-2">
-              <Link href="/dashboard" className="text-sm px-2 py-1.5 font-bold">
-                Dashboard
-              </Link>
-              <Link href="/about" className="text-sm px-2 py-1.5 font-bold">
-                About
-              </Link>
-            </nav>
-          </SheetContent>
-        </Sheet>
-
-        {/* Auth Section */}
-        <div className="flex items-center gap-2">
           <UserButton
             appearance={{
               elements: {
@@ -90,6 +71,56 @@ export default function Header() {
               </Button>
             </SignInButton>
           </SignedOut>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden flex items-center">
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "h-7 w-7",
+              },
+            }}
+            afterSignOutUrl="/"
+          />
+          <SignedOut>
+            <SignInButton>
+              <Button
+                variant="default"
+                size="sm"
+                className="h-7 text-xs px-3 font-bold mr-2"
+              >
+                Sign In
+              </Button>
+            </SignInButton>
+          </SignedOut>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-1"
+                aria-label="Open menu"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-48">
+              <nav className="flex flex-col space-y-2">
+                {isSignedIn ? (
+                  <Link
+                    href="/dashboard"
+                    className="text-sm px-2 py-1.5 font-bold"
+                  >
+                    Dashboard
+                  </Link>
+                ) : null}
+                <Link href="/about" className="text-sm px-2 py-1.5 font-bold">
+                  About
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

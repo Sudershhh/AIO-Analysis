@@ -1,4 +1,15 @@
-import { Bot, Zap, Rocket, Shield, Search, Code } from "lucide-react";
+import {
+  Bot,
+  Zap,
+  Rocket,
+  Shield,
+  Search,
+  Code,
+  FileText,
+  Settings,
+  BarChart,
+  RefreshCw,
+} from "lucide-react";
 
 export const headlines = [
   "Website Visibility",
@@ -23,7 +34,7 @@ export const testimonials = [
     company: "TechGrowth",
     content:
       "AIO Analysis Tool transformed our approach to AI optimization. Our site's visibility improved by 200% in just two months.",
-    avatar: "/api/placeholder/40/40",
+    avatar: "/avatar-female.jfif",
   },
   {
     name: "Michael Rodriguez",
@@ -31,7 +42,7 @@ export const testimonials = [
     company: "Future Scale",
     content:
       "The insights from AIO helped us identify and fix critical robots.txt issues we didn't even know existed.",
-    avatar: "/api/placeholder/40/40",
+    avatar: "/avatar-male.jfif",
   },
   {
     name: "Emily Watson",
@@ -39,7 +50,7 @@ export const testimonials = [
     company: "DevFlow",
     content:
       "The real-time analysis and recommendations have made AI optimization accessible and actionable for our entire team.",
-    avatar: "/api/placeholder/40/40",
+    avatar: "/avatar-female.jfif",
   },
 ];
 
@@ -132,3 +143,66 @@ export const fadeInUp = {
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.6 },
 };
+
+export const howItWorks = [
+  {
+    icon: FileText,
+    title: "Upload Your robots.txt",
+    description: "Simply paste your robots.txt content or upload the file",
+  },
+  {
+    icon: Settings,
+    title: "Automated Analysis",
+    description: "Our AI analyzes your file for optimization opportunities",
+  },
+  {
+    icon: BarChart,
+    title: "Get Insights",
+    description: "Receive detailed reports and actionable recommendations",
+  },
+];
+
+export const analytics = [
+  {
+    label: "Crawl Rate",
+    value: "+127%",
+    icon: RefreshCw,
+    trend: "up",
+  },
+  {
+    label: "Optimization Score",
+    value: "94",
+    icon: BarChart,
+    trend: "up",
+  },
+  {
+    label: "Pages Indexed",
+    value: "12,847",
+    icon: FileText,
+    trend: "up",
+  },
+  {
+    label: "AI Visibility Score",
+    value: "A+",
+    icon: Bot,
+    trend: "stable",
+  },
+];
+
+export const faq = [
+  {
+    question: "What is AI Optimization?",
+    answer:
+      "AI Optimization involves configuring your website to be more easily understood and indexed by AI-powered crawlers and search engines. This includes properly structured robots.txt files, sitemaps, and metadata optimized for machine learning algorithms.",
+  },
+  {
+    question: "How does the AIO Analysis Tool work?",
+    answer:
+      "Our tool analyzes your robots.txt file and website structure using advanced AI algorithms. It provides real-time recommendations for improving crawler accessibility, identifies potential issues, and suggests optimizations to enhance your site's visibility to AI-powered search engines.",
+  },
+  {
+    question: "Is this different from regular SEO?",
+    answer:
+      "Yes! While traditional SEO focuses on keywords and human-readable content, AI Optimization focuses on making your site more accessible and understandable to AI crawlers and machine learning algorithms. This becomes increasingly important as search engines evolve to use more AI-powered ranking systems.",
+  },
+];

@@ -37,7 +37,7 @@ export const useRobotsStore = create<RobotsState>((set, get) => ({
       const normalizedUrl = normalizeURL(url.trim());
 
       const response = await fetch(
-        `/api/fetch-robots?url=${encodeURIComponent(normalizedUrl)}`
+        `/api/robots?url=${encodeURIComponent(normalizedUrl)}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch robots.txt");
