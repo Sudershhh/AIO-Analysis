@@ -11,7 +11,7 @@ import Features from "./Features";
 import Testimonials from "./Testimonials";
 import PricingSection from "./PricingSection";
 import Analytics from "./Analytics";
-import Faq from "./FAQ";
+import Faq from "./Faq";
 
 function ProductLanding() {
   const [headlineIndex, setHeadlineIndex] = useState(0);
